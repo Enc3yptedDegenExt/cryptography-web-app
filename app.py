@@ -10,17 +10,7 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/hash', methods=['POST'])
-def hash_text():
-    text = request.form.get('text')
-    algorithm = request.form.get('algorithm')
-    if algorithm == 'sha256':
-        hashed_text = hashlib.sha256(text.encode()).hexdigest()
-    elif algorithm == 'sha512':
-        hashed_text = hashlib.sha512(text.encode()).hexdigest()
-    else:
-        return jsonify({'error': 'Unsupported algorithm'}), 400
-    return jsonify({'hash': hashed_text})
+
 
 @app.route('/encrypt', methods=['POST'])
 def encrypt_text():
