@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hash Algorithm</title>
+     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Encrypt and Decrypt Container -->
+<div class="flex flex-col sm:flex-row justify-between items-start w-full max-w-7xl mx-auto my-8 gap-8">
+    <!-- Encrypt Section -->
+    <div class="flex-1 p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-center py-5 bg-gray-800 text-white w-full">Encrypt Text</h2>
+        <form id="encryptForm" class="w-full max-w-lg mx-auto">
+            <label for="encryptText" class="block">Text:</label>
+            <textarea id="encryptText" name="text" rows="4" class="w-full p-2 mb-4 rounded shadow focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+            <input type="submit" value="Encrypt" class="w-full p-2 bg-gray-800 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        </form>
+        <div id="encryptResult" class="bg-gray-300 p-4 mt-4 rounded shadow"></div>
+    </div>
+
+    <!-- Decrypt Section -->
+    <div class="flex-1 p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-center py-5 bg-gray-800 text-white w-full">Decrypt Text</h2>
+        <form id="decryptForm" class="w-full max-w-lg mx-auto">
+            <label for="decryptCiphertext" class="block">Ciphertext:</label>
+            <input type="text" id="decryptCiphertext" name="ciphertext" class="w-full p-2 mb-4 rounded shadow focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <label for="decryptKey" class="block">Key:</label>
+            <input type="text" id="decryptKey" name="key" class="w-full p-2 mb-4 rounded shadow focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <input type="submit" value="Decrypt" class="w-full p-2 bg-gray-800 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        </form>
+        <div id="decryptResult" class="bg-gray-300 p-4 mt-4 rounded shadow"></div>
+    </div>
+</div>
+
+
+
+
+    <script>
+        
+        document.getElementById('encryptForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const text = document.getElementById('encryptText').value;
+            fetch('/encrypt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${encodeURIComponent(text)}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear previous output
+                const encryptResult = document.getElementById('encryptResult');
+                encryptResult.innerHTML = '';
+        
+                // Create container for encrypted output
+                const encryptedOutput = document.createElement('div');
+                encryptedOutput.className = 'encrypted-output';
+        
+                // Create elements for ciphertext and key
+                const ciphertextItem = document.createElement('div');
+                ciphertextItem.className = 'encrypted-item';
+                ciphertextItem.textContent = `Ciphertext: ${data.ciphertext}`;
+                encryptedOutput.appendChild(ciphertextItem);
+        
+                const keyItem = document.createElement('div');
+                keyItem.className = 'encrypted-item';
+                keyItem.textContent = `Key: ${data.key}`;
+                encryptedOutput.appendChild(keyItem);
+        
+                // Append the encrypted output to the result container
+                encryptResult.appendChild(encryptedOutput);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('encryptResult').textContent = 'An error occurred.';
+            });
+        });
+        
+
+        document.getElementById('decryptForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const ciphertext = document.getElementById('decryptCiphertext').value;
+            const key = document.getElementById('decryptKey').value;
+            fetch('/decrypt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `ciphertext=${encodeURIComponent(ciphertext)}&key=${encodeURIComponent(key)}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear previous output
+                const decryptResult = document.getElementById('decryptResult');
+                decryptResult.innerHTML = '';
+        
+                // Create container for decrypted output
+                const decryptedOutput = document.createElement('div');
+                decryptedOutput.className = 'decrypted-output'; // Use 'encrypted-output' if you prefer to reuse the same styles
+        
+                // Create element for decrypted text
+                const decryptedItem = document.createElement('div');
+                decryptedItem.className = 'decrypted-item'; // Use 'encrypted-item' if you prefer to reuse the same styles
+                decryptedItem.textContent = `Plaintext: ${data.plaintext}`;
+                decryptedOutput.appendChild(decryptedItem);
+        
+                // Append the decrypted output to the result container
+                decryptResult.appendChild(decryptedOutput);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('decryptResult').textContent = 'An error occurred.';
+            });
+        });
+        
+    </script>
+</body>
+</html>
